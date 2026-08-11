@@ -45,6 +45,10 @@ If you need stronger boundaries, containerize or sandbox Pi. See [packages/codin
 - **Plain Docker**: run the whole `pi` process in a local container for simple isolation.
 - **OpenShell**: run the whole `pi` process in a policy-controlled sandbox.
 
+## Offline `pi-subagents` bundle
+
+For Linux and Windows portable Pi installations without npm registry access, see [`docs/offline/pi-subagents-0.46.0`](docs/offline/pi-subagents-0.46.0). It contains the pinned `pi-subagents` package and its runtime dependencies, an installation README, and SHA-256 checksums.
+
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines and [AGENTS.md](AGENTS.md) for project-specific rules (for both humans and agents).  Longer term plans for Pi can also be found in [RFCs](https://rfc.earendil.com/keyword/pi/).
