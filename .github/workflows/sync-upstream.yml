@@ -53,6 +53,3 @@ jobs:
             Automated synchronization from `earendil-works/pi`.
 
             This PR must pass the repository checks before it is merged. Release tagging is performed only after this PR is merged successfully.
-          labels: |
-            upstream-sync
-            automated
