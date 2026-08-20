@@ -1,0 +1,58 @@
+name: Sync Pi upstream
+
+on:
+  schedule:
+    - cron: '37 3 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: sync-pi-upstream
+  cancel-in-progress: true
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out fork
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: main
+
+      - name: Merge upstream main
+        shell: bash
+        run: |
+          set -euo pipefail
+          git remote add upstream https://github.com/earendil-works/pi.git
+          git fetch --no-tags upstream main
+          if git merge-base --is-ancestor upstream/main HEAD; then
+            echo "UPSTREAM_CHANGED=false" >> "$GITHUB_ENV"
+            exit 0
+          fi
+          branch="automation/sync-upstream-$(date -u +%Y%m%d%H%M%S)"
+          git switch -c "$branch"
+          git merge --no-edit upstream/main
+          echo "UPSTREAM_CHANGED=true" >> "$GITHUB_ENV"
+          echo "SYNC_BRANCH=$branch" >> "$GITHUB_ENV"
+
+      - name: Open synchronization pull request
+        if: env.UPSTREAM_CHANGED == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          base: main
+          branch: ${{ env.SYNC_BRANCH }}
+          delete-branch: true
+          title: 'chore: sync Pi upstream'
+          commit-message: 'chore: sync Pi upstream'
+          body: |
+            Automated synchronization from `earendil-works/pi`.
+
+            This PR must pass the repository checks before it is merged. Release tagging is performed only after this PR is merged successfully.
+          labels: |
+            upstream-sync
+            automated
